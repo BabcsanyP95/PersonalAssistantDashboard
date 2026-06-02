@@ -6,9 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Enums\RecurringFrequency;
 use App\Enums\TransactionType;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class RecurringTransaction extends Model
 {
+
+    use HasFactory;
+
     protected $fillable = [
         'user_id',
         'category_id',
