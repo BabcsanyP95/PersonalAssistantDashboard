@@ -63,6 +63,25 @@
 
         </div>
 
+        <div class="mb-4">
+
+            <select v-model="selectedCategory" class="w-full border p-2 rounded">
+                <option :value="null">All categories</option>
+
+                <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                </option>
+
+            </select>
+
+        </div>
+
+        <p v-if="selectedCategory" class="text-sm text-gray-500 mb-2">
+            Filtering by:
+            {{
+                categoryStore.categories.find(c => c.id === selectedCategory)?.name
+            }}
+        </p>
         <!-- Transactions -->
         <div class="bg-white p-4 rounded-xl border shadow-sm">
 
@@ -80,7 +99,7 @@
             </p>
 
             <!-- Empty state -->
-            <p v-else-if="safeTransactions.length === 0" class="text-gray-500">
+            <p v-else-if="filteredTransactions.length === 0" class="text-gray-500">
                 No transactions found
             </p>
 
@@ -119,7 +138,7 @@
             <!-- List -->
             <div v-else class="space-y-3">
 
-                <div v-for="tx in safeTransactions" :key="tx.id"
+                <div v-for="tx in filteredTransactions" :key="tx.id"
                     class="flex justify-between items-center border-b pb-2">
 
                     <div>
@@ -166,11 +185,17 @@ const auth = useAuthStore()
 const txStore = useTransactionStore()
 const categoryStore = useCategoryStore()
 // SAFE fallback (prevents null crashes)
-const safeTransactions = computed(() => {
-    return Array.isArray(txStore.transactions)
+const filteredTransactions = computed(() => {
+    const txs = Array.isArray(txStore.transactions)
         ? txStore.transactions.filter(t => t && t.id)
         : []
+
+    if (!selectedCategory.value) return txs
+
+    return txs.filter(t => t.category_id === selectedCategory.value)
 })
+
+const selectedCategory = ref<number | null>(null)
 
 const totalIncome = computed(() => {
     return txStore.transactions
