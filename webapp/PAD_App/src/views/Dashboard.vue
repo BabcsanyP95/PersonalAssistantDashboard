@@ -37,11 +37,38 @@
         </div>
 
         <div class="bg-white p-4 rounded-xl border shadow-sm">
-            <h2 class="text-lg font-semibold mb-4">Overview</h2>
 
-            <div class="h-64">
-                <FinanceChart />
+            <label class="block text-sm font-medium mb-2">
+                Filter by Month
+            </label>
+
+            <input type="month" v-model="selectedMonth" class="border rounded p-2" />
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+            <!-- Income vs Expenses -->
+            <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h2 class="text-lg font-semibold mb-4">Overview</h2>
+                <div class="h-64">
+                    <FinanceChart :transactions="filteredTransactions" />
+                </div>
             </div>
+
+            <!-- Category breakdown -->
+            <div class="bg-white p-4 rounded-xl border shadow-sm">
+                <h2 class="text-lg font-semibold mb-4 text-center">
+                    Spending by Category
+                </h2>
+
+                <div class="flex justify-center">
+                    <div class="h-64 w-64">
+                        <CategoryPieChart :transactions="filteredTransactions" />
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
@@ -64,6 +91,11 @@
                     {{ cat.name }}
                 </option>
             </select>
+
+
+            <button @click="clearFilters" class="px-3 py-2 border rounded">
+                Clear Filters
+            </button>
 
             <button @click="submit" class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded">
                 Add
@@ -196,31 +228,56 @@ import { useTransactionStore } from '../stores/transactions'
 import { reactive, ref } from 'vue'
 import { useCategoryStore } from '../stores/categories'
 import FinanceChart from '../components/FinanceChart.vue'
+import CategoryPieChart from '../components/CategoryPieChart.vue'
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
 const categoryStore = useCategoryStore()
 // SAFE fallback (prevents null crashes)
 const filteredTransactions = computed(() => {
-    const txs = Array.isArray(txStore.transactions)
+    let txs = Array.isArray(txStore.transactions)
         ? txStore.transactions.filter(t => t && t.id)
         : []
 
-    if (!selectedCategory.value) return txs
+    // CATEGORY FILTER
+    if (selectedCategory.value) {
+        txs = txs.filter(
+            t => t.category_id === selectedCategory.value
+        )
+    }
 
-    return txs.filter(t => t.category_id === selectedCategory.value)
+    // MONTH FILTER
+    if (selectedMonth.value) {
+        txs = txs.filter(tx => {
+            const date = new Date(tx.transaction_date)
+
+            const year = date.getFullYear()
+            const month = String(date.getMonth() + 1).padStart(2, '0')
+
+            return `${year}-${month}` === selectedMonth.value
+        })
+    }
+
+    return txs
 })
+
+const clearFilters = () => {
+    selectedCategory.value = null
+    selectedMonth.value = ''
+}
+
+const selectedMonth = ref('')
 
 const selectedCategory = ref<number | null>(null)
 
 const totalIncome = computed(() => {
-    return txStore.transactions
+    return filteredTransactions.value
         .filter(t => t.type === 'income')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 })
 
 const totalExpenses = computed(() => {
-    return txStore.transactions
+    return filteredTransactions.value
         .filter(t => t.type === 'expense')
         .reduce((sum, t) => sum + Number(t.amount), 0)
 })
