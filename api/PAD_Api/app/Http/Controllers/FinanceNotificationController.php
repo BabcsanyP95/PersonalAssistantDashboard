@@ -1,49 +1,69 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\FinanceNotification;
 use Illuminate\Http\Request;
 
 class FinanceNotificationController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        return FinanceNotification::where('user_id', $request->user()->id)
+            ->latest()
+            ->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'message' => 'required|string',
+            'type' => 'nullable|in:info,warning,success',
+        ]);
+
+        return FinanceNotification::create([
+            ...$validated,
+            'user_id' => $request->user()->id,
+            'type' => $validated['type'] ?? 'info',
+            'is_read' => false,
+        ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(FinanceNotification $financeNotification)
+    public function markAsRead(Request $request, FinanceNotification $notification)
     {
-        //
+        $this->authorize($request, $notification);
+
+        $notification->update([
+            'is_read' => true,
+        ]);
+
+        return response()->json(['message' => 'Marked as read']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, FinanceNotification $financeNotification)
+    public function destroy(Request $request, FinanceNotification $notification)
     {
-        //
+        $this->authorize($request, $notification);
+
+        $notification->delete();
+
+        return response()->json(['message' => 'Deleted']);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(FinanceNotification $financeNotification)
+    public function markAllAsRead(Request $request)
     {
-        //
+        FinanceNotification::where('user_id', $request->user()->id)
+            ->update(['is_read' => true]);
+
+        return response()->json(['message' => 'All marked as read']);
+    }
+
+    private function authorize($request, $notification)
+    {
+        abort_if(
+            $notification->user_id !== $request->user()->id,
+            403
+        );
     }
 }
