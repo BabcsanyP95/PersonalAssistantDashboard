@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import { getTransactions } from '../api/transactions'
+import { createTransaction } from '../api/transactions'
 
 export interface Transaction {
     id: number
@@ -35,5 +36,15 @@ export const useTransactionStore = defineStore('transactions', {
                 this.loading = false
             }
         },
+        async addTransaction(payload: {
+            amount: number
+            type: 'income' | 'expense'
+            description: string
+        }) {
+            const newTx = await createTransaction(payload)
+
+            // instantly update UI
+            this.transactions.unshift(newTx)
+        }
     },
 })

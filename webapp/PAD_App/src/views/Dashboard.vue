@@ -36,6 +36,25 @@
 
         </div>
 
+        <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
+
+            <h2 class="text-lg font-semibold">Add Transaction</h2>
+
+            <input v-model="form.description" placeholder="Description" class="w-full border p-2 rounded" />
+
+            <input v-model.number="form.amount" type="number" placeholder="Amount" class="w-full border p-2 rounded" />
+
+            <select v-model="form.type" class="w-full border p-2 rounded">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+
+            <button @click="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+                Add
+            </button>
+
+        </div>
+
         <!-- Transactions -->
         <div class="bg-white p-4 rounded-xl border shadow-sm">
 
@@ -91,6 +110,7 @@
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useTransactionStore } from '../stores/transactions'
+import { reactive } from 'vue'
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
@@ -119,7 +139,28 @@ const balance = computed(() => {
 })
 
 const format = (n: number) => {
-  return n.toLocaleString('en-US')
+    return n.toLocaleString('en-US')
+}
+
+const form = reactive({
+    description: '',
+    amount: 0,
+    type: 'income' as 'income' | 'expense',
+})
+
+const submit = async () => {
+    if (!form.description || !form.amount) return
+
+    await txStore.addTransaction({
+        description: form.description,
+        amount: form.amount,
+        type: form.type,
+    })
+
+    // reset form
+    form.description = ''
+    form.amount = 0
+    form.type = 'income'
 }
 
 onMounted(async () => {
