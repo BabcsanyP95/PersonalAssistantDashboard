@@ -124,7 +124,7 @@
 
                     <div>
                         <p class="font-medium">{{ tx.description }}</p>
-                        <p class="text-sm text-gray-400">{{ tx.created_at }}</p>
+                        <p class="text-sm text-gray-400">{{ formatDate(tx.created_at) }}</p>
                     </div>
 
                     <div class="flex items-center gap-3">
@@ -190,6 +190,20 @@ const balance = computed(() => {
 
 const format = (n: number) => {
     return n.toLocaleString('en-US')
+}
+
+const formatDate = (dateString: string) => {
+    if (!dateString) return ''
+
+    const date = new Date(dateString)
+
+    return new Intl.DateTimeFormat('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+    }).format(date)
 }
 
 const form = reactive({
