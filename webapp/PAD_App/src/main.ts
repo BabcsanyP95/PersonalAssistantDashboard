@@ -5,7 +5,9 @@ import App from './App.vue'
 
 const app = createApp(App)
 
-app.use(createPinia())  // state management
-app.use(router)         // navigation
+const pinia = createPinia() // create FIRST
+
+app.use(pinia)              // register Pinia
+app.use(router)             // register router
 
 app.mount('#app')
