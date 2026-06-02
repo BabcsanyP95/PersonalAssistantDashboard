@@ -36,6 +36,14 @@
 
         </div>
 
+        <div class="bg-white p-4 rounded-xl border shadow-sm">
+            <h2 class="text-lg font-semibold mb-4">Overview</h2>
+
+            <div class="h-64">
+                <FinanceChart />
+            </div>
+        </div>
+
         <div class="bg-white p-4 rounded-xl border shadow-sm space-y-3">
 
             <h2 class="text-lg font-semibold">Add Transaction</h2>
@@ -180,6 +188,7 @@ import { useAuthStore } from '../stores/auth'
 import { useTransactionStore } from '../stores/transactions'
 import { reactive, ref } from 'vue'
 import { useCategoryStore } from '../stores/categories'
+import FinanceChart from '../components/FinanceChart.vue'
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
