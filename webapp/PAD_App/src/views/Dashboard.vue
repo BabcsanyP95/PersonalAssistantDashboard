@@ -1,5 +1,5 @@
 <template>
-    <div class="p-6 space-y-6">
+    <div class="p-4 md:p-6 space-y-6">
 
         <!-- Header -->
         <div>
@@ -11,7 +11,7 @@
         </div>
 
         <!-- Cards -->
-        <div class="grid grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
 
             <div class="bg-white p-4 rounded-xl border shadow-sm">
                 <p class="text-gray-500 text-sm">Balance</p>
@@ -65,7 +65,7 @@
                 </option>
             </select>
 
-            <button @click="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
+            <button @click="submit" class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded">
                 Add
             </button>
 
@@ -93,7 +93,7 @@
         <!-- Transactions -->
         <div class="bg-white p-4 rounded-xl border shadow-sm">
 
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
                 <h2 class="text-lg font-semibold">Transactions</h2>
 
                 <button @click="txStore.fetchTransactions" class="text-sm text-blue-500">
@@ -132,7 +132,7 @@
                     </option>
                 </select>
 
-                <div class="flex gap-2">
+                <div class="flex flex-col md:flex-row gap-2">
                     <button @click="saveEdit" class="bg-blue-600 text-white px-3 py-1 rounded">
                         Save
                     </button>
@@ -147,14 +147,21 @@
             <div v-else class="space-y-3">
 
                 <div v-for="tx in filteredTransactions" :key="tx.id"
-                    class="flex justify-between items-center border-b pb-2">
+                    class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
 
                     <div>
-                        <p class="font-medium">{{ tx.description }}</p>
-                        <p class="text-sm text-gray-400">{{ formatDate(tx.created_at) }}</p>
+                        <div>
+                            <p class="font-medium">
+                                {{ tx.description }}
+                            </p>
+
+                            <p class="text-xs text-gray-400">
+                                {{ formatDate(tx.created_at) }}
+                            </p>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-3">
+                    <div class="flex flex-wrap items-center gap-3">
 
                         <span :class="tx.type === 'income'
                             ? 'text-green-600'

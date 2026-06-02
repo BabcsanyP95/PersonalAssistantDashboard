@@ -1,5 +1,5 @@
 <template>
-  <div class="app-layout">
+  <div class="app-layout min-h-screen overflow-x-hidden">
     <Sidebar />
 
     <div class="main">
