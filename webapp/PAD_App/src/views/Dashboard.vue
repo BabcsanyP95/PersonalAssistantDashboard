@@ -15,17 +15,23 @@
 
             <div class="bg-white p-4 rounded-xl border shadow-sm">
                 <p class="text-gray-500 text-sm">Balance</p>
-                <p class="text-2xl font-bold">$2,450</p>
+                <p class="text-2xl font-bold">
+                    ${{ format(balance) }}
+                </p>
             </div>
 
             <div class="bg-white p-4 rounded-xl border shadow-sm">
                 <p class="text-gray-500 text-sm">Income</p>
-                <p class="text-2xl font-bold text-green-600">$3,200</p>
+                <p class="text-2xl font-bold text-green-600">
+                    ${{ format(totalIncome) }}
+                </p>
             </div>
 
             <div class="bg-white p-4 rounded-xl border shadow-sm">
                 <p class="text-gray-500 text-sm">Expenses</p>
-                <p class="text-2xl font-bold text-red-500">$750</p>
+                <p class="text-2xl font-bold text-red-500">
+                    ${{ format(totalExpenses) }}
+                </p>
             </div>
 
         </div>
@@ -96,6 +102,25 @@ const safeTransactions = computed(() => {
         : []
 })
 
+const totalIncome = computed(() => {
+    return txStore.transactions
+        .filter(t => t.type === 'income')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+})
+
+const totalExpenses = computed(() => {
+    return txStore.transactions
+        .filter(t => t.type === 'expense')
+        .reduce((sum, t) => sum + Number(t.amount), 0)
+})
+
+const balance = computed(() => {
+    return totalIncome.value - totalExpenses.value
+})
+
+const format = (n: number) => {
+  return n.toLocaleString('en-US')
+}
 
 onMounted(async () => {
     await auth.fetchUser()
