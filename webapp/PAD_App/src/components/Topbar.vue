@@ -3,7 +3,7 @@
     <div>Dashboard</div>
 
     <div>
-      <span v-if="auth.user">{{ auth.user.name }}</span>
+      <span v-if="auth.user" class="me-3">{{ auth.user.name }}</span>
       <button @click="logout">Logout</button>
     </div>
   </div>
