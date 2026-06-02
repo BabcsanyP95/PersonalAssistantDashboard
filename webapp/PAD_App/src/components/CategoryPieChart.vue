@@ -64,9 +64,23 @@ const buildChart = () => {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
+
             plugins: {
                 legend: {
                     position: 'bottom',
+                    align: 'center',
+                    labels: {
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        boxWidth: 8,
+                        padding: 16,
+                        font: {
+                            size: 12,
+                            family: 'Inter, sans-serif',
+                        },
+                        color: '#6b7280',
+                    },
                 },
             },
         },
