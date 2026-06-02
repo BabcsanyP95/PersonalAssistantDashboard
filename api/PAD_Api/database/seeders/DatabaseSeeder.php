@@ -5,6 +5,12 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\Budget;
+use App\Models\Category;
+use App\Models\FinanceNotification;
+use App\Models\RecurringTransaction;
+use App\Models\SavingsGoal;
+use App\Models\Transaction;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,12 +20,32 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
-        // User::factory(10)->create();
+{
+    $user = User::factory()->create([
+        'email' => 'demo@test.com',
+        'password' => bcrypt('password'),
+    ]);
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
-    }
+    $categories = Category::factory(5)->create([
+        'user_id' => $user->id,
+    ]);
+
+    Transaction::factory(50)->create([
+        'user_id' => $user->id,
+        'category_id' => $categories->random()->id,
+    ]);
+
+    Budget::factory(5)->create([
+        'user_id' => $user->id,
+        'category_id' => $categories->random()->id,
+    ]);
+
+    SavingsGoal::factory(3)->create([
+        'user_id' => $user->id,
+    ]);
+
+    FinanceNotification::factory(5)->create([
+        'user_id' => $user->id,
+    ]);
+}
 }
