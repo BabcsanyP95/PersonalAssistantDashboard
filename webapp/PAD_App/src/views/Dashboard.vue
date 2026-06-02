@@ -49,6 +49,14 @@
                 <option value="expense">Expense</option>
             </select>
 
+            <select v-model="form.category_id" class="w-full border p-2 rounded">
+                <option disabled value="">Select category</option>
+
+                <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                </option>
+            </select>
+
             <button @click="submit" class="bg-blue-600 text-white px-4 py-2 rounded">
                 Add
             </button>
@@ -76,27 +84,68 @@
                 No transactions found
             </p>
 
+
+            <div v-if="editingId" class="bg-gray-100 p-4 rounded-xl mb-4 space-y-2">
+
+                <h2 class="font-semibold">Edit Transaction</h2>
+
+                <input v-model="editForm.description" class="border p-2 w-full rounded" />
+                <input v-model.number="editForm.amount" class="border p-2 w-full rounded" />
+
+                <select v-model="editForm.type" class="border p-2 w-full rounded">
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                </select>
+
+                <select v-model="editForm.category_id" class="w-full border p-2 rounded">
+                    <option disabled value="">Select category</option>
+
+                    <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
+                        {{ cat.name }}
+                    </option>
+                </select>
+
+                <div class="flex gap-2">
+                    <button @click="saveEdit" class="bg-blue-600 text-white px-3 py-1 rounded">
+                        Save
+                    </button>
+
+                    <button @click="editingId = null" class="text-gray-600">
+                        Cancel
+                    </button>
+                </div>
+
+            </div>
             <!-- List -->
             <div v-else class="space-y-3">
 
-                <div v-for="tx in safeTransactions" :key="tx.id" class="flex justify-between border-b pb-2">
+                <div v-for="tx in safeTransactions" :key="tx.id"
+                    class="flex justify-between items-center border-b pb-2">
 
                     <div>
-                        <p class="font-medium">
-                            {{ tx.description }}
-                        </p>
-
-                        <p class="text-sm text-gray-400">
-                            {{ tx.created_at }}
-                        </p>
+                        <p class="font-medium">{{ tx.description }}</p>
+                        <p class="text-sm text-gray-400">{{ tx.created_at }}</p>
                     </div>
 
-                    <div :class="tx.type === 'income'
-                        ? 'text-green-600'
-                        : 'text-red-500'">
-                        {{ tx.type === 'income' ? '+' : '-' }}${{ tx.amount }}
-                    </div>
+                    <div class="flex items-center gap-3">
 
+                        <span :class="tx.type === 'income'
+                            ? 'text-green-600'
+                            : 'text-red-500'">
+                            {{ tx.type === 'income' ? '+' : '-' }}${{ tx.amount }}
+                        </span>
+
+                        <!-- EDIT -->
+                        <button @click="startEdit(tx)" class="text-blue-500 text-sm">
+                            Edit
+                        </button>
+
+                        <!-- DELETE -->
+                        <button @click="txStore.removeTransaction(tx.id)" class="text-red-500 text-sm">
+                            Delete
+                        </button>
+
+                    </div>
                 </div>
 
             </div>
@@ -110,11 +159,12 @@
 import { computed, onMounted } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useTransactionStore } from '../stores/transactions'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
+import { useCategoryStore } from '../stores/categories'
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
-
+const categoryStore = useCategoryStore()
 // SAFE fallback (prevents null crashes)
 const safeTransactions = computed(() => {
     return Array.isArray(txStore.transactions)
@@ -146,6 +196,8 @@ const form = reactive({
     description: '',
     amount: 0,
     type: 'income' as 'income' | 'expense',
+    category_id: null as number | null,
+    transaction_date: new Date().toISOString().split('T')[0],
 })
 
 const submit = async () => {
@@ -153,8 +205,10 @@ const submit = async () => {
 
     await txStore.addTransaction({
         description: form.description,
-        amount: form.amount,
+        amount: Number(form.amount),
         type: form.type,
+        category_id: form.category_id,
+        transaction_date: form.transaction_date,
     })
 
     // reset form
@@ -162,6 +216,41 @@ const submit = async () => {
     form.amount = 0
     form.type = 'income'
 }
+
+const editingId = ref<number | null>(null)
+
+const editForm = reactive({
+    description: '',
+    amount: 0,
+    type: 'income' as 'income' | 'expense',
+    category_id: null as number | null,
+    transaction_date: new Date().toISOString().split('T')[0],
+})
+
+const startEdit = (tx: any) => {
+    editingId.value = tx.id
+
+    editForm.description = tx.description
+    editForm.amount = tx.amount
+    editForm.type = tx.type
+}
+
+const saveEdit = async () => {
+    if (!editingId.value) return
+
+    await txStore.addTransaction({
+        description: editForm.description,
+        amount: Number(editForm.amount),
+        type: editForm.type,
+        category_id: editForm.category_id,
+        transaction_date: editForm.transaction_date,
+    })
+
+    editingId.value = null
+}
+onMounted(() => {
+    categoryStore.fetchCategories()
+})
 
 onMounted(async () => {
     await auth.fetchUser()

@@ -1,6 +1,10 @@
 import { defineStore } from 'pinia'
 import { getTransactions } from '../api/transactions'
 import { createTransaction } from '../api/transactions'
+import {
+    updateTransaction,
+    deleteTransaction
+} from '../api/transactions'
 
 export interface Transaction {
     id: number
@@ -37,14 +41,28 @@ export const useTransactionStore = defineStore('transactions', {
             }
         },
         async addTransaction(payload: {
+            description: string
             amount: number
             type: 'income' | 'expense'
-            description: string
+            category_id: number | null
+            transaction_date: string
         }) {
             const newTx = await createTransaction(payload)
 
-            // instantly update UI
             this.transactions.unshift(newTx)
+        },
+        async editTransaction(id: number, payload: any) {
+            const updated = await updateTransaction(id, payload)
+
+            const index = this.transactions.findIndex(t => t.id === id)
+            if (index !== -1) {
+                this.transactions[index] = updated
+            }
+        },
+        async removeTransaction(id: number) {
+            await deleteTransaction(id)
+
+            this.transactions = this.transactions.filter(t => t.id !== id)
         }
     },
 })
