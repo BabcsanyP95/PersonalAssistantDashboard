@@ -1,5 +1,17 @@
 <template>
   <header class="h-14 bg-white border-b flex items-center justify-between px-4 md:px-6">
+    <div class="flex items-center gap-3">
+
+      <!-- MOBILE MENU BUTTON -->
+      <button class="md:hidden text-gray-700 text-xl" @click="emit('toggle-sidebar')">
+        ☰
+      </button>
+
+      <h1 class="font-semibold text-gray-800">
+        {{ title }}
+      </h1>
+
+    </div>
 
     <!-- Left: Page Title -->
     <div class="flex items-center gap-3">
@@ -39,6 +51,7 @@ import { useAuthStore } from '../stores/auth'
 const auth = useAuthStore()
 const router = useRouter()
 const route = useRoute()
+const emit = defineEmits(['toggle-sidebar'])
 
 const logout = () => {
   auth.logout()

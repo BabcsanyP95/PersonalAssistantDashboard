@@ -1,5 +1,12 @@
 <template>
-  <aside class="w-64 bg-slate-900 text-white flex flex-col">
+  <!-- overlay -->
+  <div v-if="isOpen" class="fixed inset-0 bg-black/50 z-40 md:hidden" @click="isOpen = false" />
+
+  <!-- sidebar -->
+  <aside :class="[
+    'fixed md:static z-50 top-0 left-0 h-screen w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 overflow-y-auto',
+    isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+  ]">
     <!-- Logo -->
     <div class="p-6 border-b border-slate-800">
       <h1 class="text-xl font-bold">
@@ -41,10 +48,11 @@ import {
   Wallet,
   Tags,
 } from 'lucide-vue-next'
-
+import { ref } from 'vue'
 
 const router = useRouter()
 const auth = useAuthStore()
+const isOpen = ref(false)
 
 const links = [
   {
@@ -69,33 +77,14 @@ const logout = () => {
 
   router.push('/login')
 }
+
+const open = () => (isOpen.value = true)
+const close = () => (isOpen.value = false)
+
+defineExpose({
+  open,
+  close,
+})
 </script>
 
-<style scoped>
-.sidebar {
-  width: 220px;
-  background: #111827;
-  color: white;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  height: 100vh;
-}
-
-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-a {
-  color: white;
-  text-decoration: none;
-  opacity: 0.8;
-}
-
-a:hover {
-  opacity: 1;
-}
-</style>
+<style scoped></style>
