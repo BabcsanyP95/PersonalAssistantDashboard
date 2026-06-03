@@ -1,13 +1,18 @@
 <template>
-  <div class="app-layout min-h-screen overflow-x-hidden">
+  <div class="min-h-screen flex">
+
     <Sidebar />
 
-    <div class="main">
+    <div class="flex-1 flex flex-col">
+
       <Topbar />
-      <div class="content">
+
+      <main class="flex-1 overflow-y-auto">
         <router-view />
-      </div>
+      </main>
+
     </div>
+
   </div>
 </template>
 
