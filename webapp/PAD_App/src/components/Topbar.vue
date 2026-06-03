@@ -1,25 +1,76 @@
 <template>
-  <div class="topbar">
-    <div>Dashboard</div>
+  <header class="h-14 bg-white border-b flex items-center justify-between px-4 md:px-6">
 
-    <div>
-      <span v-if="auth.user" class="me-3">{{ auth.user.name }}</span>
-      <button @click="logout">Logout</button>
+    <!-- Left: Page Title -->
+    <div class="flex items-center gap-3">
+      <h1 class="font-semibold text-gray-800">
+        {{ title }}
+      </h1>
     </div>
-  </div>
+
+    <!-- Right: User section -->
+    <div class="flex items-center gap-4">
+
+      <!-- User name -->
+      <div class="hidden md:block text-sm text-gray-600">
+        {{ auth.user?.name }}
+      </div>
+
+      <!-- Avatar -->
+      <div class="w-8 h-8 rounded-full bg-slate-800 text-white flex items-center justify-center text-sm">
+        {{ initials }}
+      </div>
+
+      <!-- Logout -->
+      <button @click="logout" class="text-sm text-red-500 hover:text-red-600">
+        Logout
+      </button>
+
+    </div>
+
+  </header>
 </template>
 
 <script setup lang="ts">
-import { useAuthStore } from '../stores/auth.ts'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
 const auth = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 
 const logout = () => {
   auth.logout()
   router.push('/login')
 }
+
+/**
+ * Dynamic page title based on route
+ */
+const title = computed(() => {
+  switch (route.path) {
+    case '/dashboard':
+      return 'Dashboard'
+    case '/transactions':
+      return 'Transactions'
+    default:
+      return 'App'
+  }
+})
+
+/**
+ * User initials (nice UI touch)
+ */
+const initials = computed(() => {
+  const name = auth.user?.name || ''
+  return name
+    .split(' ')
+    .map(n => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+})
 </script>
 
 <style scoped>
