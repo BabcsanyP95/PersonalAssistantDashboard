@@ -31,7 +31,7 @@ class TransactionController extends Controller
             'user_id' => $request->user()->id,
         ]);
 
-        return response()->json($transaction);
+        return $transaction->load('category');
     }
 
     public function show(Request $request, Transaction $transaction)
@@ -55,7 +55,7 @@ class TransactionController extends Controller
 
         $transaction->update($validated);
 
-        return response()->json($transaction);
+        return $transaction->load('category');
     }
 
     public function destroy(Request $request, Transaction $transaction)

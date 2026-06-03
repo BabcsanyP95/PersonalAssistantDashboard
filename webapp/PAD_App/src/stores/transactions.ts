@@ -51,18 +51,27 @@ export const useTransactionStore = defineStore('transactions', {
 
             this.transactions.unshift(newTx)
         },
-        async editTransaction(id: number, payload: any) {
-            const updated = await updateTransaction(id, payload)
-
-            const index = this.transactions.findIndex(t => t.id === id)
-            if (index !== -1) {
-                this.transactions[index] = updated
-            }
-        },
         async removeTransaction(id: number) {
             await deleteTransaction(id)
 
             this.transactions = this.transactions.filter(t => t.id !== id)
+        },
+        async updateTransaction(id: number, payload: any) {
+            this.loading = true
+
+            try {
+                const res = await updateTransaction(id, payload)
+
+                // replace in local state
+                const index = this.transactions.findIndex(t => t.id === id)
+
+                if (index !== -1) {
+                    this.transactions[index] = res
+                }
+
+            } finally {
+                this.loading = false
+            }
         }
     },
 })

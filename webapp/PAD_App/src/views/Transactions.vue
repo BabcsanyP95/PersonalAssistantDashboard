@@ -44,10 +44,6 @@
             </select>
 
 
-            <button @click="clearFilters" class="px-3 py-2 border rounded">
-                Clear Filters
-            </button>
-
             <button @click="submit" class="w-full md:w-auto bg-blue-600 text-white px-4 py-2 rounded">
                 Add
             </button>
@@ -130,37 +126,48 @@
             <div v-else class="space-y-3">
 
                 <div v-for="tx in filteredTransactions" :key="tx.id"
-                    class="flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+                    class="bg-white border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 hover:shadow-sm transition">
 
-                    <div>
-                        <div>
-                            <p class="font-medium">
-                                {{ tx.description }}
-                            </p>
+                    <div class="flex flex-col">
 
-                            <p class="text-xs text-gray-400">
-                                {{ formatDate(tx.created_at) }}
-                            </p>
-                        </div>
-                    </div>
+                        <p class="font-medium text-gray-900">
+                            {{ tx.description }}
+                        </p>
 
-                    <div class="flex flex-wrap items-center gap-3">
-
-                        <span :class="tx.type === 'income'
-                            ? 'text-green-600'
-                            : 'text-red-500'">
-                            {{ tx.type === 'income' ? '+' : '-' }}${{ tx.amount }}
+                        <span v-if="tx.category"
+                            class="inline-block mt-1 text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600 w-fit">
+                            {{ tx.category.name }}
                         </span>
 
-                        <!-- EDIT -->
-                        <button @click="startEdit(tx)" class="text-blue-500 text-sm">
-                            Edit
-                        </button>
+                        <p class="text-xs text-gray-400 mt-1">
+                            {{ tx.category?.name ?? 'Uncategorized' }} • {{ formatDate(tx.transaction_date) }}
+                        </p>
 
-                        <!-- DELETE -->
-                        <button @click="txStore.removeTransaction(tx.id)" class="text-red-500 text-sm">
-                            Delete
-                        </button>
+                    </div>
+
+                    <div class="flex items-center justify-between md:justify-end gap-4">
+
+
+                        <!-- Amount -->
+                        <div :class="tx.type === 'income'
+                            ? 'text-green-600 font-semibold'
+                            : 'text-red-500 font-semibold'" class="text-right">
+                            {{ tx.type === 'income' ? '+' : '-' }}${{ tx.amount }}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex gap-2">
+
+                            <button @click="startEdit(tx)" class="text-blue-500 text-sm hover:underline">
+                                Edit
+                            </button>
+
+                            <button @click="txStore.removeTransaction(tx.id)"
+                                class="text-red-500 text-sm hover:underline">
+                                Delete
+                            </button>
+
+                        </div>
 
                     </div>
                 </div>
@@ -178,8 +185,7 @@ import { useAuthStore } from '../stores/auth'
 import { useTransactionStore } from '../stores/transactions'
 import { reactive, ref } from 'vue'
 import { useCategoryStore } from '../stores/categories'
-import FinanceChart from '../components/FinanceChart.vue'
-import CategoryPieChart from '../components/CategoryPieChart.vue'
+
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
@@ -211,6 +217,7 @@ const filteredTransactions = computed(() => {
 
     return txs
 })
+
 
 const clearFilters = () => {
     selectedCategory.value = null
@@ -296,12 +303,14 @@ const startEdit = (tx: any) => {
     editForm.description = tx.description
     editForm.amount = tx.amount
     editForm.type = tx.type
+    editForm.category_id = tx.category_id
+    editForm.transaction_date = tx.transaction_date?.split('T')[0]
 }
 
 const saveEdit = async () => {
     if (!editingId.value) return
 
-    await txStore.addTransaction({
+    await txStore.updateTransaction(editingId.value, {
         description: editForm.description,
         amount: Number(editForm.amount),
         type: editForm.type,
