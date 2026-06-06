@@ -71,7 +71,10 @@ const loginUser = async () => {
   try {
     error.value = null
 
-    await auth.login(email.value, password.value)
+    await auth.login({
+      email: email.value,
+      password: password.value
+    })
 
     router.push('/')
   } catch (e: any) {
