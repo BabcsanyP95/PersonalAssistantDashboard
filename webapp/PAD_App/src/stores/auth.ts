@@ -6,6 +6,7 @@ export const useAuthStore = defineStore('auth', {
         user: null as any,
         token: localStorage.getItem('token') || '',
         loading: false,
+        authReady: false
     }),
 
     getters: {
@@ -46,7 +47,11 @@ export const useAuthStore = defineStore('auth', {
             } catch (e) {
                 // token invalid → reset auth
                 this.logout()
+            } finally
+            {
+              this.authReady = true
             }
+
         },
 
         async logout() {

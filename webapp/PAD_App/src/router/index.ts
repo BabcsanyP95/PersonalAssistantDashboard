@@ -7,6 +7,7 @@ import MainLayout from '../layouts/MainLayout.vue'
 import Dashboard from '../views/Dashboard.vue'
 import Transactions from '../views/Transactions.vue'
 import Categories from '../views/Categories.vue'
+import { useAuthStore } from '@/stores/auth.ts'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -49,12 +50,23 @@ const router = createRouter({
 })
 
 // auth guard
-router.beforeEach((to) => {
-  const token = localStorage.getItem('token')
+router.beforeEach(async (to) => {
+    const auth = useAuthStore()
 
-  if (to.meta.requiresAuth && !token) {
-    return '/login'
-  }
+    // wait until auth is initialized
+    if (!auth.authReady) {
+        await auth.fetchUser()
+    }
+
+    const isLoggedIn = !!auth.token
+
+    if (to.meta.requiresAuth && !isLoggedIn) {
+        return '/login'
+    }
+
+    if (to.path === '/login' && isLoggedIn) {
+        return '/dashboard'
+    }
 })
 
 export default router

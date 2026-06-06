@@ -12,5 +12,5 @@ onMounted(async () => {
 </script>
 
 <template>
-  <router-view />
+  <router-view v-if="auth.authReady"/>
 </template>
