@@ -7,9 +7,6 @@
         ☰
       </button>
 
-      <h1 class="font-semibold text-gray-800">
-        {{ title }}
-      </h1>
 
     </div>
 
@@ -65,8 +62,13 @@ const title = computed(() => {
   switch (route.path) {
     case '/dashboard':
       return 'Dashboard'
+
     case '/transactions':
       return 'Transactions'
+
+    case '/categories':
+      return 'Categories'
+
     default:
       return 'App'
   }
