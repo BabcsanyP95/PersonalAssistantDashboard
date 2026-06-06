@@ -5,6 +5,7 @@ import MainLayout from '../layouts/MainLayout.vue'
 
 import Dashboard from '../views/Dashboard.vue'
 import Transactions from '../views/Transactions.vue'
+import Categories from '../views/Categories.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -28,6 +29,10 @@ const router = createRouter({
           component: Transactions,
         },
         {
+          path: 'categories',
+          component: Categories,
+        },
+        {
           path: '',
           redirect: '/dashboard',
         },
@@ -37,11 +42,11 @@ const router = createRouter({
 })
 
 router.beforeEach((to) => {
-    const token = localStorage.getItem('token')
+  const token = localStorage.getItem('token')
 
-    if (to.meta.requiresAuth && !token) {
-        return '/login'
-    }
+  if (to.meta.requiresAuth && !token) {
+    return '/login'
+  }
 })
 
 export default router
