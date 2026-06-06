@@ -11,7 +11,14 @@ export interface Transaction {
     amount: number
     type: 'income' | 'expense'
     description: string
+    category_id: number | null
+    transaction_date: string
     created_at: string
+
+    category?: {
+        id: number
+        name: string
+    } | null
 }
 
 export const useTransactionStore = defineStore('transactions', {

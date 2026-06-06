@@ -77,10 +77,12 @@ const title = computed(() => {
  * User initials (nice UI touch)
  */
 const initials = computed(() => {
-  const name = auth.user?.name || ''
+  const name = auth.user?.name ?? ''
+
   return name
     .split(' ')
-    .map(n => n[0])
+    .filter(Boolean)
+    .map((n: string) => n[0])
     .slice(0, 2)
     .join('')
     .toUpperCase()
