@@ -8,14 +8,19 @@ export const useAuthStore = defineStore('auth', {
         loading: false,
     }),
 
+    getters: {
+        isAuthenticated: (state) => !!state.token,
+    },
+
     actions: {
+
         async login(payload: { email: string; password: string }) {
             const res = await login(payload)
 
             this.token = res.token
-            this.user = res.user
-
             localStorage.setItem('token', res.token)
+
+            await this.fetchUser() // 👈 IMPORTANT
         },
 
         async register(payload: {
@@ -27,16 +32,21 @@ export const useAuthStore = defineStore('auth', {
             const res = await register(payload)
 
             this.token = res.token
-            this.user = res.user
-
             localStorage.setItem('token', res.token)
+
+            await this.fetchUser() // 👈 IMPORTANT
         },
 
         async fetchUser() {
             if (!this.token) return
 
-            const res = await getUser()
-            this.user = res
+            try {
+                const res = await getUser()
+                this.user = res
+            } catch (e) {
+                // token invalid → reset auth
+                this.logout()
+            }
         },
 
         async logout() {
