@@ -87,10 +87,16 @@ const categoryStore = useCategoryStore()
 
 const editingId = ref<number | null>(null)
 
-const form = reactive({
-    name: '',
-    type: 'expense',
-    color: '#3b82f6'
+type CategoryForm = {
+  name: string
+  type: 'income' | 'expense'
+  color: string
+}
+
+const form = reactive<CategoryForm>({
+  name: '',
+  type: 'expense',
+  color: '#3b82f6'
 })
 
 const save = async () => {

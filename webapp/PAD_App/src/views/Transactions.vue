@@ -251,23 +251,25 @@ const format = (n: number) => {
 const formatDate = (dateString: string) => {
     if (!dateString) return ''
 
-    const date = new Date(dateString)
-
     return new Intl.DateTimeFormat('en-GB', {
         day: '2-digit',
         month: 'short',
         year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit',
-    }).format(date)
+    }).format(new Date(dateString))
 }
 
-const form = reactive({
+const form = reactive<{
+    description: string
+    amount: number
+    type: 'income' | 'expense'
+    category_id: number | null
+    transaction_date: string
+}>({
     description: '',
     amount: 0,
-    type: 'income' as 'income' | 'expense',
-    category_id: null as number | null,
-    transaction_date: new Date().toISOString().split('T')[0],
+    type: 'income',
+    category_id: null,
+    transaction_date: new Date().toISOString().split('T')[0] ?? '',
 })
 
 const submit = async () => {
@@ -304,7 +306,7 @@ const startEdit = (tx: any) => {
     editForm.amount = tx.amount
     editForm.type = tx.type
     editForm.category_id = tx.category_id
-    editForm.transaction_date = tx.transaction_date?.split('T')[0]
+    editForm.transaction_date = tx.transaction_date.split('T')[0]
 }
 
 const saveEdit = async () => {
