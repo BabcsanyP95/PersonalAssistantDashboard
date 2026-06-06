@@ -76,7 +76,7 @@ const loginUser = async () => {
       password: password.value
     })
 
-    router.push('/')
+    router.replace('/dashboard')
   } catch (e: any) {
     error.value = 'Login failed'
     console.error(e)

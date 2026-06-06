@@ -75,7 +75,7 @@ const links = [
 const logout = () => {
   auth.logout()
 
-  router.push('/login')
+  router.replace('/login')
 }
 
 const open = () => (isOpen.value = true)

@@ -51,7 +51,7 @@ const emit = defineEmits(['toggle-sidebar'])
 
 const logout = () => {
   auth.logout()
-  router.push('/login')
+  router.replace('/login')
 }
 
 /**

@@ -72,6 +72,10 @@ export const useTransactionStore = defineStore('transactions', {
             } finally {
                 this.loading = false
             }
+        },
+        reset() {
+            this.transactions = []
+            this.loading = false
         }
     },
 })
