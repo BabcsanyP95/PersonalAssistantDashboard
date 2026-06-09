@@ -25,6 +25,8 @@ return new class extends Migration {
             $table->text('description')->nullable();
 
             $table->date('transaction_date');
+            $table->unsignedTinyInteger('month');
+            $table->unsignedSmallInteger('year');
 
             $table->softDeletes();
             $table->timestamps();

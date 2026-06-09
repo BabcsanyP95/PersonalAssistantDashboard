@@ -24,10 +24,16 @@ class BudgetController extends Controller
             'amount' => 'required|numeric|min:0',
         ]);
 
-        return Budget::create([
-            ...$validated,
+        $budget = Budget::create([
             'user_id' => $request->user()->id,
+            'category_id' => $validated['category_id'],
+            'month' => $validated['month'],
+            'year' => $validated['year'],
+            'original_amount' => $validated['amount'],
+            'current_amount' => $validated['amount'],
         ]);
+
+        return $budget->load('category');
     }
 
     public function update(Request $request, Budget $budget)
@@ -50,7 +56,7 @@ class BudgetController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
-    private function authorizeBudget($request, $budget)
+    private function authorizeBudget(Request $request, Budget $budget)
     {
         abort_if($budget->user_id !== $request->user()->id, 403);
     }

@@ -47,6 +47,7 @@ import {
   LayoutDashboard,
   Wallet,
   Tags,
+  PiggyBank
 } from 'lucide-vue-next'
 import { ref } from 'vue'
 
@@ -69,6 +70,11 @@ const links = [
     name: 'Categories',
     path: '/categories',
     icon: Tags,
+  },
+  {
+    name: "Budgets",
+    path: "/budgets",
+    icon: PiggyBank,
   },
 ]
 

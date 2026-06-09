@@ -19,16 +19,18 @@ class Transaction extends Model
         'amount',
         'description',
         'transaction_date',
+        'month',
+        'year',
     ];
 
     protected function casts(): array
-{
-    return [
-        'amount' => 'decimal:2',
-        'transaction_date' => 'date',
-        'type' => TransactionType::class,
-    ];
-}
+    {
+        return [
+            'amount' => 'decimal:2',
+            'transaction_date' => 'date',
+            'type' => TransactionType::class,
+        ];
+    }
 
     public function user(): BelongsTo
     {

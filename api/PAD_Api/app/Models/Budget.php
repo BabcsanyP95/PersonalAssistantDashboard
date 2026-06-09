@@ -16,13 +16,15 @@ class Budget extends Model
         'category_id',
         'month',
         'year',
-        'amount',
+        'original_amount',
+        'current_amount',
     ];
 
     protected function casts(): array
     {
         return [
-            'amount' => 'decimal:2',
+            'original_amount' => 'decimal:2',
+            'current_amount' => 'decimal:2',
         ];
     }
 
