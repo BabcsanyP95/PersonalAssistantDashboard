@@ -68,19 +68,26 @@
                         </p>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <p class="font-bold">
-                            ${{ budget.current_amount }} remaining
-                        </p>
+                    <div class="mt-3">
 
-                        <p class="text-xs text-gray-500">
-                            Budget: ${{ budget.original_amount }}
-                        </p>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="h-2 rounded-full transition-all duration-300" :class="getBarColor(budget)"
+                                :style="{ width: Math.min(getProgress(budget), 100) + '%' }"></div>
+                        </div>
 
-                        <button @click="removeBudget(budget.id)"
-                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm">
-                            Delete
-                        </button>
+                        <div class="flex justify-between text-xs text-gray-500 mt-1 gap-3">
+                            <span>
+                                Spent: ${{ getSpent(budget) }} 
+                            </span>
+
+                            <span>
+                                Remaining: ${{ budget.current_amount }}
+                            </span>
+                            <span v-if="getProgress(budget) >= 80" class="text-red-500 text-xs">
+                                Near limit ⚠️
+                            </span>
+                        </div>
+
                     </div>
                 </div>
             </div>
@@ -94,6 +101,7 @@ import { reactive, onMounted } from "vue"
 
 import { useBudgetStore } from "@/stores/budgets"
 import { useCategoryStore } from "@/stores/categories"
+import { computed } from "vue"
 
 const budgetStore = useBudgetStore()
 const categoryStore = useCategoryStore()
@@ -136,6 +144,22 @@ const removeBudget = async (id: number) => {
     if (!confirmed) return
 
     await budgetStore.removeBudget(id)
+}
+
+const getSpent = (budget: any) => {
+    return Number(budget.original_amount) - Number(budget.current_amount)
+}
+
+const getProgress = (budget: any) => {
+    return (getSpent(budget) / Number(budget.original_amount)) * 100
+}
+
+const getBarColor = (budget: any) => {
+    const p = getProgress(budget)
+
+    if (p >= 100) return 'bg-red-500'
+    if (p >= 80) return 'bg-yellow-500'
+    return 'bg-green-500'
 }
 
 onMounted(async () => {
