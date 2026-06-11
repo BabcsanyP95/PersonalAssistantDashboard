@@ -84,6 +84,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/goals', [SavingsGoalController::class, 'store']);
     Route::put('/goals/{goal}', [SavingsGoalController::class, 'update']);
     Route::delete('/goals/{goal}', [SavingsGoalController::class, 'destroy']);
+    Route::post('/goals/{goal}/deposit', [SavingsGoalController::class, 'deposit']);
 
     /*
     |---------------------------------------

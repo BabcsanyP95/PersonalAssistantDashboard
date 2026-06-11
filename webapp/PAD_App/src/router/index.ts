@@ -8,6 +8,7 @@ import Dashboard from '../views/Dashboard.vue'
 import Transactions from '../views/Transactions.vue'
 import Categories from '../views/Categories.vue'
 import Budgets from '@/views/Budgets.vue'
+import Savings from '@/views/Savings.vue'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -32,7 +33,8 @@ const router = createRouter({
         { path: 'dashboard', component: Dashboard },
         { path: 'transactions', component: Transactions },
         { path: 'categories', component: Categories },
-        { path: 'budgets', component: Budgets}
+        { path: 'budgets', component: Budgets},
+        { path: 'savings', component: Savings}
       ],
     },
   ],

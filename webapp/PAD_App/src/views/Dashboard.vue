@@ -153,7 +153,7 @@ const form = reactive({
     amount: 0,
     type: 'income' as 'income' | 'expense',
     category_id: null as number | null,
-    transaction_date: new Date().toISOString().split('T')[0],
+    transaction_date: new Date().toISOString().split('T')[0]!,
 })
 
 const submit = async () => {
@@ -180,7 +180,7 @@ const editForm = reactive({
     amount: 0,
     type: 'income' as 'income' | 'expense',
     category_id: null as number | null,
-    transaction_date: new Date().toISOString().split('T')[0],
+    transaction_date: new Date().toISOString().split('T')[0]!,
 })
 
 const startEdit = (tx: any) => {

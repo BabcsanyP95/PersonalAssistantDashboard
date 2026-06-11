@@ -53,6 +53,19 @@ class SavingsGoalController extends Controller
         return response()->json(['message' => 'Deleted']);
     }
 
+    public function deposit(Request $request, SavingsGoal $goal)
+    {
+        $this->authorizeGoal($request, $goal);
+
+        $data = $request->validate([
+            'amount' => 'required|numeric|min:0.01',
+        ]);
+
+        $goal->increment('current_amount', $data['amount']);
+
+        return $goal->fresh();
+    }
+
     private function authorizeGoal($request, $goal)
     {
         abort_if($goal->user_id !== $request->user()->id, 403);

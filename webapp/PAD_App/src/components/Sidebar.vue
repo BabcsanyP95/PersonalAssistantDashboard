@@ -19,7 +19,7 @@
     </div>
 
     <nav class="flex-1 p-4 space-y-2">
-      <RouterLink v-for="link in links" :key="link.path" :to="link.path"
+      <RouterLink v-for="link in links" :key="link.path" :to="link.path" @click="close"
         class="flex items-center gap-3 px-4 py-2 rounded hover:bg-slate-800 transition"
         active-class="bg-slate-800 font-medium">
         <component :is="link.icon" :size="18" />
@@ -29,11 +29,25 @@
 
     <!-- User Section -->
     <div class="p-4 border-t border-slate-800">
-      <p class="text-sm text-slate-300">
-        {{ auth.user?.name }}
-      </p>
+      <div class="flex items-center gap-3 mb-3">
 
-      <button @click="logout" class="mt-2 text-red-400 hover:text-red-300 text-sm">
+        <div class="w-10 h-10 rounded-full bg-slate-700 flex items-center justify-center font-semibold">
+          {{ initials }}
+        </div>
+
+        <div>
+          <p class="text-sm font-medium">
+            {{ auth.user?.name }}
+          </p>
+
+          <p class="text-xs text-slate-400">
+            {{ auth.user?.email }}
+          </p>
+        </div>
+
+      </div>
+
+      <button @click="logout" class="w-full rounded-lg bg-red-500/20 py-2 text-red-400 hover:bg-red-500/30 transition">
         Logout
       </button>
     </div>
@@ -47,9 +61,10 @@ import {
   LayoutDashboard,
   Wallet,
   Tags,
-  PiggyBank
+  PiggyBank,
+  Target,
 } from 'lucide-vue-next'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -72,11 +87,28 @@ const links = [
     icon: Tags,
   },
   {
-    name: "Budgets",
-    path: "/budgets",
+    name: 'Budgets',
+    path: '/budgets',
     icon: PiggyBank,
   },
+  {
+    name: 'Savings Goals',
+    path: '/savings',
+    icon: Target,
+  },
 ]
+
+const initials = computed(() => {
+  const name = auth.user?.name ?? ''
+
+  return name
+    .split(' ')
+    .filter(Boolean)
+    .map((n: string) => n[0])
+    .slice(0, 2)
+    .join('')
+    .toUpperCase()
+})
 
 const logout = () => {
   auth.logout()
