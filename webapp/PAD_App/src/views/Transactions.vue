@@ -30,10 +30,14 @@
 
             <input v-model.number="form.amount" type="number" placeholder="Amount" class="w-full border p-2 rounded" />
 
-            <select v-model="form.type" class="w-full border p-2 rounded">
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-            </select>
+            <p v-if="selectedCategoryObject" class="text-sm text-gray-500">
+                Type:
+                <span :class="selectedCategoryObject.type === 'income'
+                    ? 'text-green-600'
+                    : 'text-red-500'">
+                    {{ selectedCategoryObject.type }}
+                </span>
+            </p>
 
             <select v-model="form.category_id" class="w-full border p-2 rounded">
                 <option disabled value="">Select category</option>
@@ -98,10 +102,14 @@
                 <input v-model="editForm.description" class="border p-2 w-full rounded" />
                 <input v-model.number="editForm.amount" class="border p-2 w-full rounded" />
 
-                <select v-model="editForm.type" class="border p-2 w-full rounded">
-                    <option value="income">Income</option>
-                    <option value="expense">Expense</option>
-                </select>
+                <p v-if="selectedEditCategory" class="text-sm text-gray-500">
+                    Type:
+                    <span :class="selectedEditCategory.type === 'income'
+                        ? 'text-green-600'
+                        : 'text-red-500'">
+                        {{ selectedEditCategory.type }}
+                    </span>
+                </p>
 
                 <select v-model="editForm.category_id" class="w-full border p-2 rounded">
                     <option disabled value="">Select category</option>
@@ -180,30 +188,30 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import { useTransactionStore } from '../stores/transactions'
-import { reactive, ref } from 'vue'
 import { useCategoryStore } from '../stores/categories'
-
 
 const auth = useAuthStore()
 const txStore = useTransactionStore()
 const categoryStore = useCategoryStore()
-// SAFE fallback (prevents null crashes)
+
+const selectedMonth = ref('')
+const selectedCategory = ref<number | null>(null)
+const editingId = ref<number | null>(null)
+
 const filteredTransactions = computed(() => {
     let txs = Array.isArray(txStore.transactions)
         ? txStore.transactions.filter(t => t && t.id)
         : []
 
-    // CATEGORY FILTER
     if (selectedCategory.value) {
         txs = txs.filter(
             t => t.category_id === selectedCategory.value
         )
     }
 
-    // MONTH FILTER
     if (selectedMonth.value) {
         txs = txs.filter(tx => {
             const date = new Date(tx.transaction_date)
@@ -217,16 +225,6 @@ const filteredTransactions = computed(() => {
 
     return txs
 })
-
-
-const clearFilters = () => {
-    selectedCategory.value = null
-    selectedMonth.value = ''
-}
-
-const selectedMonth = ref('')
-
-const selectedCategory = ref<number | null>(null)
 
 const totalIncome = computed(() => {
     return filteredTransactions.value
@@ -244,6 +242,18 @@ const balance = computed(() => {
     return totalIncome.value - totalExpenses.value
 })
 
+const selectedCategoryObject = computed(() =>
+    categoryStore.categories.find(
+        c => c.id === form.category_id
+    )
+)
+
+const selectedEditCategory = computed(() =>
+    categoryStore.categories.find(
+        c => c.id === editForm.category_id
+    )
+)
+
 const format = (n: number) => {
     return n.toLocaleString('en-US')
 }
@@ -258,77 +268,86 @@ const formatDate = (dateString: string) => {
     }).format(new Date(dateString))
 }
 
-const form = reactive<{
-    description: string
-    amount: number
-    type: 'income' | 'expense'
-    category_id: number | null
-    transaction_date: string
-}>({
+const form = reactive({
     description: '',
     amount: 0,
-    type: 'income',
-    category_id: null,
-    transaction_date: new Date().toISOString().split('T')[0] ?? '',
+    category_id: null as number | null,
+    transaction_date: new Date().toISOString().slice(0, 10),
 })
 
 const submit = async () => {
-    if (!form.description || !form.amount) return
+    if (
+        !form.description ||
+        !form.amount ||
+        !form.category_id
+    ) {
+        return
+    }
+
+    const category = categoryStore.categories.find(
+        c => c.id === form.category_id
+    )
+
+    if (!category) return
 
     await txStore.addTransaction({
         description: form.description,
         amount: Number(form.amount),
-        type: form.type,
+        type: category.type,
         category_id: form.category_id,
         transaction_date: form.transaction_date,
     })
 
-    // reset form
     form.description = ''
     form.amount = 0
-    form.type = 'income'
+    form.category_id = null
+    form.transaction_date = new Date()
+        .toISOString()
+        .slice(0, 10)
 }
-
-const editingId = ref<number | null>(null)
 
 const editForm = reactive({
     description: '',
     amount: 0,
-    type: 'income' as 'income' | 'expense',
     category_id: null as number | null,
-    transaction_date: new Date().toISOString().split('T')[0],
+    transaction_date: new Date().toISOString().slice(0, 10),
 })
 
 const startEdit = (tx: any) => {
     editingId.value = tx.id
 
     editForm.description = tx.description
-    editForm.amount = tx.amount
-    editForm.type = tx.type
+    editForm.amount = Number(tx.amount)
     editForm.category_id = tx.category_id
-    editForm.transaction_date = tx.transaction_date.split('T')[0]
+    editForm.transaction_date =
+        tx.transaction_date.split('T')[0]
 }
 
 const saveEdit = async () => {
     if (!editingId.value) return
 
+    const category = categoryStore.categories.find(
+        c => c.id === editForm.category_id
+    )
+
+    if (!category) return
+
     await txStore.updateTransaction(editingId.value, {
         description: editForm.description,
         amount: Number(editForm.amount),
-        type: editForm.type,
+        type: category.type,
         category_id: editForm.category_id,
         transaction_date: editForm.transaction_date,
     })
 
     editingId.value = null
 }
-onMounted(() => {
-    categoryStore.fetchCategories()
-})
 
 onMounted(async () => {
-    await auth.fetchUser()
-
-    await txStore.fetchTransactions()
+    await Promise.all([
+        auth.fetchUser(),
+        categoryStore.fetchCategories(),
+        txStore.fetchTransactions(),
+    ])
 })
 </script>

@@ -68,6 +68,12 @@ const title = computed(() => {
     case '/categories':
       return 'Categories'
 
+    case '/budgets':
+      return 'Budgets'
+    
+    case '/savings':
+      return 'Savings'
+    
     default:
       return 'App'
   }
