@@ -42,6 +42,7 @@ export const useCategoryStore = defineStore('categories', {
       const category = await createCategory(payload)
 
       this.categories.unshift(category)
+      return category;
     },
 
     async updateCategory(

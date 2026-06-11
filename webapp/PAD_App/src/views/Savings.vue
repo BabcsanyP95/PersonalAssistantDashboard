@@ -111,10 +111,16 @@
 import { reactive, onMounted } from "vue"
 
 import { useSavingsStore } from "../stores/savings"
+import { useTransactionStore } from "@/stores/transactions"
+import { useCategoryStore } from "@/stores/categories"
+
+const txStore = useTransactionStore()
+const categoryStore = useCategoryStore()
 
 const savingsStore = useSavingsStore()
 
 const deposits = reactive<Record<number, number>>({})
+
 
 const form = reactive({
 
@@ -145,19 +151,45 @@ const submit = async () => {
 }
 
 const deposit = async (goal: any) => {
-    const amount = deposits[goal.id] || 0
+    const amount = Number(deposits[goal.id] || 0)
 
     if (amount <= 0) return
 
-    await savingsStore.deposit(goal.id, amount)
+    const categoryName = `Savings: ${goal.name}`
+
+    let category = categoryStore.categories.find(
+        c => c.name === categoryName
+    )
+
+    if (!category) {
+        category = await categoryStore.addCategory({
+            name: categoryName,
+            type: "expense",
+            color: "#22c55e",
+        })
+    }
+
+    await txStore.addTransaction({
+        description: `Savings deposit: ${goal.name}`,
+        amount,
+        type: "expense",
+        category_id: category!.id,
+        transaction_date: new Date().toISOString().slice(0, 10),
+    })
+
+    await savingsStore.editGoal(goal.id, {
+        ...goal,
+        current_amount: Number(goal.current_amount) + amount,
+    })
 
     deposits[goal.id] = 0
 }
 
-onMounted(() => {
-
-    savingsStore.fetchGoals()
-
+onMounted(async () => {
+    await Promise.all([
+        savingsStore.fetchGoals(),
+        categoryStore.fetchCategories(),
+    ])
 })
 
 </script>
