@@ -59,36 +59,43 @@
             <div v-for="budget in budgetStore.budgets" :key="budget.id" class="border rounded-lg p-4 mb-3">
                 <div class="flex justify-between items-start">
                     <div>
-                        <p class="font-semibold">
-                            {{ budget.category?.name }}
-                        </p>
-
+                        <p class="font-semibold">{{ budget.category?.name }}</p>
                         <p class="text-sm text-gray-500">
                             {{ budget.month }}/{{ budget.year }}
                         </p>
                     </div>
 
-                    <div class="mt-3">
 
-                        <div class="w-full bg-gray-200 rounded-full h-2">
-                            <div class="h-2 rounded-full transition-all duration-300" :class="getBarColor(budget)"
-                                :style="{ width: Math.min(getProgress(budget), 100) + '%' }"></div>
+                    <div class="mt-2 flex items-start gap-8">
+                        <!-- Delete Button -->
+                        <button @click="removeBudget(budget.id)"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-red-600 bg-red-50 rounded-lg border border-red-200 hover:bg-red-100 transition-all shrink-0">
+                            🗑️ Delete
+                        </button>
+
+                        <!-- Progress Section -->
+                        <div class="flex-1 mt-1">
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="h-2 rounded-full transition-all duration-300" :class="getBarColor(budget)"
+                                    :style="{ width: Math.min(getProgress(budget), 100) + '%' }"></div>
+                            </div>
+
+                            <div class="flex justify-between text-xs text-gray-500 mt-1 gap-3">
+                                <span>
+                                    Spent: ${{ getSpent(budget) }}
+                                </span>
+
+                                <span>
+                                    Remaining: ${{ budget.current_amount }}
+                                </span>
+
+                                <span v-if="getProgress(budget) >= 80" class="text-red-500">
+                                    Near limit ⚠️
+                                </span>
+                            </div>
                         </div>
-
-                        <div class="flex justify-between text-xs text-gray-500 mt-1 gap-3">
-                            <span>
-                                Spent: ${{ getSpent(budget) }} 
-                            </span>
-
-                            <span>
-                                Remaining: ${{ budget.current_amount }}
-                            </span>
-                            <span v-if="getProgress(budget) >= 80" class="text-red-500 text-xs">
-                                Near limit ⚠️
-                            </span>
-                        </div>
-
                     </div>
+
                 </div>
             </div>
 
