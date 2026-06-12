@@ -50,7 +50,7 @@
 
         <!-- Budget List -->
 
-        <div class="bg-white rounded-xl border shadow-sm p-4">
+        <div v-if="budgetStore.budgets.length > 0" class="bg-white rounded-xl border shadow-sm p-4">
 
             <h2 class="font-semibold mb-4">
                 Current Budgets
