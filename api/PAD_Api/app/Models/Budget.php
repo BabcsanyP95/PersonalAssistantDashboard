@@ -18,6 +18,7 @@ class Budget extends Model
         'year',
         'original_amount',
         'current_amount',
+        'amount'
     ];
 
     protected function casts(): array

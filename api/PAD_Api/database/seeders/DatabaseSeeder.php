@@ -85,6 +85,8 @@ class DatabaseSeeder extends Seeder
                 'amount' => fake()->randomFloat(2, 5, 1000),
                 'description' => fake()->sentence(3),
                 'transaction_date' => fake()->dateTimeBetween('-6 months', 'now'),
+                'month' => date('Y-m', strtotime($transaction['transaction_date'] ?? 'now')),
+                'year' => date('Y', strtotime($transaction['transaction_date'] ?? 'now')),
             ]);
         }
 
@@ -100,7 +102,8 @@ class DatabaseSeeder extends Seeder
                 'category_id' => $category->id,
                 'month' => now()->month,
                 'year' => now()->year,
-                'amount' => fake()->randomFloat(2, 200, 2000),
+                'original_amount' => $budgetData['amount'] ?? 100.00,
+                'current_amount' => $budgetData['amount'] ?? 100.00,
             ]);
         }
 

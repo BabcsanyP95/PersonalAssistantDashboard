@@ -30,6 +30,7 @@ class TransactionFactory extends Factory
                 ? fake()->randomElement($expenseDescriptions)
                 : fake()->randomElement($incomeDescriptions),
             'transaction_date' => fake()->dateTimeBetween('-6 months', 'now'),
+            'month' => now()->format('Y-m'),
         ];
     }
 }

@@ -4,10 +4,10 @@ services:
     restart: unless-stopped
 
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ALLOW_EMPTY_PASSWORD: yes
+      MYSQL_DATABASE: "finance_tracker"
+      MYSQL_USER: "finance_user"
+      MYSQL_PASSWORD: "secret"
 
     ports:
       - "3306:3306"
@@ -33,16 +33,12 @@ services:
   vue:
     build:
       context: ./webapp/PAD_App
-
     container_name: finance-vue
-
     ports:
-      - "5173:5173"
-
+      - "5180:5180"
     volumes:
       - ./webapp/PAD_App:/app
       - /app/node_modules
-
     depends_on:
       - laravel
 
