@@ -26,6 +26,7 @@ services:
 
     volumes:
       - ./api/PAD_Api:/app
+      - /app/vendor
 
     depends_on:
       - mysql

@@ -122,6 +122,10 @@ Build all images and start the services in detached mode:
 
 ```bash
 sudo docker compose up --build -d
+
+sudo docker compose exec laravel php artisan key:generate
+sudo docker compose exec laravel chmod -R 775 storage bootstrap/cache
+sudo docker compose exec laravel php artisan migrate:fresh --seed
 ```
 
 ### Application Endpoints
