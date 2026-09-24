@@ -1,6 +1,6 @@
 # Personal Assistant Dashboard (PAD)
 
-#⚠️ This was my first ever project. Written to learn, not to impress. Kept here for progress tracking.
+#⚠️ This was my first ever project. Kept here for progress tracking.
 
 A full-stack personal finance management application built with **Laravel**, **Vue 3**, **TypeScript**, and **MySQL**. The application helps users track income, expenses, budgets, savings goals, and overall financial activity through an interactive dashboard.
 
